@@ -18,8 +18,15 @@ pub mod errors {
     // Create the Error, ErrorKind, ResultExt, and Result types
     error_chain!{
         foreign_links {
-            Io(std::io::Error) #[doc = "Error when interfacing with I/O"];
             Yaml(serde_yaml::Error) #[doc = "Error when parsing a yaml file"];
+        }
+        errors {
+            /// If a config file does not exist (at the given path) this error
+            /// will be returned
+            MissingConfigFile(f: String) {
+                description("config file was not found at the specified path"),
+                display("missing config file: '{}'", f),
+            }
         }
     }
 }
@@ -68,6 +75,13 @@ pub struct Config {
 }
 
 impl Config {
+    /// Fetches the current config based on the user's configured environment.
+    ///
+    /// This includes `$KUBECONFIG` when set, or simply `$HOME/.kube/config`
+    /// otherwise.
+    ///
+    /// TODO: Support multiple kubeconfig files in the KUBECONFIG env var
+    /// separated by colons, i.e. `KUBECONFIG=file1:file2`.
     pub fn load_default() -> Result<Config> {
         if let Ok(conf_path) = env::var("KUBECONFIG") {
             return Config::load(&conf_path);
@@ -77,11 +91,12 @@ impl Config {
             return Config::load(&format!("{}/.kube/config", &home));
         }
 
-        Err(Error::from_kind(ErrorKind::Msg(String::from("$KUBECONFIG and $HOME are not defined"))))
+        bail!("Neither $KUBECONFIG nor $HOME are defined");
     }
 
     pub fn load(path: &str) -> Result<Config> {
-        let conf = read_to_string(&path)?;
+        let conf = read_to_string(&path)
+            .chain_err(|| ErrorKind::MissingConfigFile(path.to_string()))?;
         let conf = serde_yaml::from_str(&conf)?;
         Ok(conf)
     }
