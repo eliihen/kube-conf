@@ -1,6 +1,7 @@
-[![Build Status](https://travis-ci.org/esphen/kube-conf.svg?branch=master)](https://travis-ci.org/esphen/kube-conf)
-
 # kube-conf
+
+![Crates.io](https://img.shields.io/crates/v/kube-config.svg)
+[![Build Status](https://travis-ci.org/esphen/kube-conf.svg?branch=master)](https://travis-ci.org/esphen/kube-conf)
 
 > Easily fetch the local Kubernetes config file
 
