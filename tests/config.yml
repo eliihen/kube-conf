@@ -26,7 +26,8 @@ contexts:
   name: exp-scratch
 current-context: default/dev-m01-example-com:8443/user
 kind: Config
-preferences: {}
+preferences:
+  fooValue: abc
 users:
 - name: developer
   user:

@@ -33,6 +33,8 @@ pub mod errors {
 
 use std::fs::read_to_string;
 use std::env;
+use std::collections::HashMap;
+use serde_yaml::Mapping;
 use errors::*;
 
 /// The main struct that holds the entire config map.
@@ -67,11 +69,23 @@ use errors::*;
 /// ```
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    // pub clusters: Vec<Cluster>,
-    // pub contexts: Vec<Context>,
-    // pub users: Vec<User>,
+    /// Will typically be "v1"
+    #[serde(rename="apiVersion")]
+    pub api_version: Option<String>,
+
+    /// Will typically be "Config"
+    pub kind: Option<String>,
+
     #[serde(rename="current-context")]
     pub current_context: Option<String>,
+
+    pub preferences: Option<Mapping>,
+
+    //pub clusters: Vec<Cluster>,
+
+    //pub contexts: Vec<Context>,
+
+    //pub users: Vec<User>,
 }
 
 impl Config {
@@ -101,3 +115,4 @@ impl Config {
         Ok(conf)
     }
 }
+
