@@ -1,7 +1,6 @@
-use crate::get::{get_bool, get_mapping, get_string};
-use serde::{de, Deserialize, Deserializer};
-use serde_yaml::{Error as YamlError, Mapping};
-use std::convert::TryFrom;
+use crate::get::{get_mapping, get_string};
+use serde::{Deserialize, Deserializer};
+use serde_yaml::Mapping;
 
 /// TODO
 #[derive(Debug)]

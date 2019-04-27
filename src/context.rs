@@ -1,6 +1,6 @@
 use crate::get::{get_mapping, get_string};
 use serde::{Deserialize, Deserializer};
-use serde_yaml::{Mapping};
+use serde_yaml::Mapping;
 
 /// TODO
 #[derive(Debug)]

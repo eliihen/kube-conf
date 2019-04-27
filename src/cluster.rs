@@ -1,7 +1,6 @@
 use crate::get::{get_bool, get_mapping, get_string};
-use serde::{de, Deserialize, Deserializer};
-use serde_yaml::{Error as YamlError, Mapping};
-use std::convert::TryFrom;
+use serde::{Deserialize, Deserializer};
+use serde_yaml::Mapping;
 
 /// A cluster that
 #[derive(Debug)]
@@ -37,7 +36,7 @@ impl<'de> Deserialize<'de> for Cluster {
         let cluster = get_mapping(map, "cluster")?;
 
         Ok(Cluster {
-            name: name,
+            name,
             certificate_authority: get_string::<D::Error>(&cluster, "certificate-authority").ok(),
             certificate_authority_data: get_string::<D::Error>(
                 &cluster,

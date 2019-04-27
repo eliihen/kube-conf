@@ -11,7 +11,7 @@ where
     map.get(&key_val)
         .ok_or_else(|| Error::missing_field("Field was not found"))?
         .as_str()
-        .map(|s| String::from(s))
+        .map(String::from)
         .ok_or_else(|| E::missing_field("Field could not be parsed as string"))
 }
 
@@ -37,6 +37,6 @@ where
         .ok_or_else(|| Error::missing_field("Field was not found"))?
         .as_mapping()
         // Clone to avoid returning reference to discarded local variable
-        .map(|m| m.clone())
+        .cloned()
         .ok_or_else(|| E::missing_field("Field could not be parsed as mapping"))
 }
