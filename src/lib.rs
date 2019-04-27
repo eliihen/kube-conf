@@ -1,3 +1,36 @@
+//! Welcome to the `kube-conf` crate.
+//!
+//! This crate is a convenient way of fetching the local user's kubernetes
+//! config file and reading the values.
+//!
+//! # Examples
+//!
+//! ## Fetching current context
+//!
+//! ```
+//! use kube_conf::Config;
+//! let config = Config::load("tests/config.yml")?;
+//! let current_context = config.get_current_context().unwrap();
+//!
+//! assert_eq!("dev-frontend", current_context.name);
+//! # Ok::<(), kube_conf::errors::Error>(())
+//! ```
+//!
+//! ## Fetching the default kubeconfig file
+//!
+//! This typically means the file located at `$HOME/.kube/config`
+//!
+//! ```
+//! use kube_conf::Config;
+//! # use std::env::{set_var, current_dir};
+//! # set_var("HOME", format!("{}/tests", current_dir().unwrap().to_str().unwrap()));
+//! let config = Config::load_default()?;
+//! let current_context = config.current_context.unwrap();
+//!
+//! assert_eq!("dev-frontend", current_context);
+//! # Ok::<(), kube_conf::errors::Error>(())
+//! ```
+
 // `error_chain!` can recurse deeply
 #![recursion_limit = "1024"]
 
@@ -6,7 +39,6 @@ extern crate error_chain;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_yaml;
-extern crate void;
 
 pub mod cluster;
 pub mod context;
@@ -49,34 +81,6 @@ use user::User;
 
 /// The main struct that holds the entire config map.
 /// See the methods on this struct for ways to parse a config.
-///
-/// # Examples
-///
-/// ## Fetching current context
-///
-/// ```
-/// use kube_conf::Config;
-/// let config = Config::load("tests/config.yml")?;
-/// let current_context = config.get_current_context().unwrap();
-///
-/// assert_eq!("dev-frontend", current_context.name);
-/// # Ok::<(), kube_conf::errors::Error>(())
-/// ```
-///
-/// ## Fetching the default kubeconfig file
-///
-/// This typically means the file located at `$HOME/.kube/config`
-///
-/// ```
-/// use kube_conf::Config;
-/// # use std::env::{set_var, current_dir};
-/// # set_var("HOME", format!("{}/tests", current_dir().unwrap().to_str().unwrap()));
-/// let config = Config::load_default()?;
-/// let current_context = config.current_context.unwrap();
-///
-/// assert_eq!("dev-frontend", current_context);
-/// # Ok::<(), kube_conf::errors::Error>(())
-/// ```
 #[serde(rename_all = "kebab-case")]
 #[derive(Debug, Clone, Deserialize)]
 pub struct Config {
