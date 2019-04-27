@@ -20,6 +20,7 @@ mod user;
 /// the underlying errors are not lost. See the
 /// [ErrorKind](errors/enum.ErrorKind.html) enum for the various errors that can
 /// be returned.
+#[allow(deprecated)]
 pub mod errors {
     // Create the Error, ErrorKind, ResultExt, and Result types
     error_chain! {
