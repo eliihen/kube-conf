@@ -1,15 +1,34 @@
+//! The module holding the `Cluster` struct
+
 use crate::get::{get_bool, get_mapping, get_string};
 use serde::{Deserialize, Deserializer};
 use serde_yaml::Mapping;
+use std::path::PathBuf;
 
-/// A cluster that
+/// A cluster represents a cluster that the user knows how to connect to.
+///
+/// Note: The cluster struct is flattened when compared to its representation in
+/// the yaml file. There is no `cluster` mapping, the values of the `cluster`
+/// mapping are directly accessible on the `Cluster` struct.
 #[derive(Debug, Clone)]
 pub struct Cluster {
+    /// The name given to the cluster by the user
     pub name: String,
+
+    /// The HTTP address to the server, including protocol
     pub server: String,
-    pub certificate_authority: Option<String>,
+
+    /// A `PathBuf` representing the certificate authority associated with this
+    /// cluster. This is a path to a file on the disk.
+    pub certificate_authority: Option<PathBuf>,
+
+    /// A string representing the certificate authority associated with this
+    /// cluster. This is a base64 encoded string containing the CA data.
     pub certificate_authority_data: Option<String>,
-    pub insecure_skip_tls_verify: Option<bool>,
+
+    /// When set to true this is a signal that any certificate checking should
+    /// be bypassed by the user agent.
+    pub insecure_skip_tls_verify: bool,
 }
 
 /*
@@ -37,15 +56,17 @@ impl<'de> Deserialize<'de> for Cluster {
 
         Ok(Cluster {
             name,
-            certificate_authority: get_string::<D::Error>(&cluster, "certificate-authority").ok(),
+            server: get_string::<D::Error>(&cluster, "server")?,
+            certificate_authority: get_string::<D::Error>(&cluster, "certificate-authority")
+                .map(PathBuf::from)
+                .ok(),
             certificate_authority_data: get_string::<D::Error>(
                 &cluster,
                 "certificate-authority-data",
             )
             .ok(),
             insecure_skip_tls_verify: get_bool::<D::Error>(&cluster, "insecure-skip-tls-verify")
-                .ok(),
-            server: get_string::<D::Error>(&cluster, "server")?,
+                .unwrap_or_default(),
         })
 
         // Cluster::try_from(map)

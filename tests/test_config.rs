@@ -1,6 +1,7 @@
 use kube_conf::errors::*;
 use kube_conf::Config;
 use serde_yaml::Value;
+use std::path::PathBuf;
 
 #[test]
 pub fn it_loads_using_default() -> Result<()> {
@@ -82,23 +83,22 @@ pub fn it_returns_the_cluster_set() -> Result<()> {
     );
     assert_eq!(
         cluster1.certificate_authority.as_ref().unwrap(),
-        "fake-ca-file",
+        &PathBuf::from("fake-ca-file"),
         "Expected the first cluster to have a CA configured"
     );
     assert_eq!(
         cluster1.server, "https://1.2.3.4",
         "Expected the first cluster to have a server configured"
     );
+    assert_eq!(
+        cluster1.insecure_skip_tls_verify, false,
+        "Expected the first cluster to have the default value of skip_tls (false)"
+    );
 
     let cluster2 = config.clusters.get(1).unwrap();
-    assert!(
-        cluster2.insecure_skip_tls_verify.is_some(),
-        "Expected the second cluster to have a skip_tls flag set"
-    );
     assert_eq!(
-        cluster2.insecure_skip_tls_verify.unwrap(),
-        true,
-        "Expected the first second to have a skip_tls flag set"
+        cluster2.insecure_skip_tls_verify, true,
+        "Expected the second cluster to have a skip_tls flag set"
     );
     assert_eq!(
         cluster2.server, "https://5.6.7.8",
@@ -153,7 +153,7 @@ pub fn it_returns_the_users_set() -> Result<()> {
     );
     assert_eq!(
         user1.client_certificate.as_ref().unwrap(),
-        "fake-cert-file",
+        &PathBuf::from("fake-cert-file"),
         "Expected the first user to have the correct client-certificate configured"
     );
 
@@ -163,7 +163,7 @@ pub fn it_returns_the_users_set() -> Result<()> {
     );
     assert_eq!(
         user1.client_key.as_ref().unwrap(),
-        "fake-key-file",
+        &PathBuf::from("fake-key-file"),
         "Expected the first user to have the correct client-key configured"
     );
 

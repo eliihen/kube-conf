@@ -8,10 +8,10 @@ extern crate serde_derive;
 extern crate serde_yaml;
 extern crate void;
 
-mod cluster;
-mod context;
+pub mod cluster;
+pub mod context;
 mod get;
-mod user;
+pub mod user;
 
 /// A module that exposes errors thrown by the crate.
 ///
