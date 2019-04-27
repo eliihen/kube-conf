@@ -31,20 +31,6 @@ pub struct Cluster {
     pub insecure_skip_tls_verify: bool,
 }
 
-/*
-impl<'de> TryFrom<Mapping> for Cluster {
-    type Error = de::Error + 'de;
-    fn try_from(map: Mapping) -> Result<Self, Self::Error> {
-        // let cluster = get_map(map, "cluster");
-        Ok(Cluster {
-            name: get_string(map, "name")?,
-            certificate_authority: Some(String::new()),
-            server: Some(String::new()),
-        })
-    }
-}
-*/
-
 impl<'de> Deserialize<'de> for Cluster {
     fn deserialize<D>(d: D) -> Result<Self, D::Error>
     where
@@ -72,3 +58,31 @@ impl<'de> Deserialize<'de> for Cluster {
         // Cluster::try_from(map)
     }
 }
+
+/*
+TODO Write a working TryFrom impl
+
+impl TryFrom<Mapping> for Cluster {
+    type Error = de::Error:
+    fn try_from(map: Mapping) -> Result<Self, Self::Error> {
+        // let cluster = get_map(map, "cluster");
+        let name = get_string(&map, "name")?;
+        let cluster = get_mapping(map, "cluster")?;
+
+        Ok(Cluster {
+            name,
+            server: get_string::<D::Error>(&cluster, "server")?,
+            certificate_authority: get_string::<D::Error>(&cluster, "certificate-authority")
+                .map(PathBuf::from)
+                .ok(),
+            certificate_authority_data: get_string::<D::Error>(
+                &cluster,
+                "certificate-authority-data",
+            )
+            .ok(),
+            insecure_skip_tls_verify: get_bool::<D::Error>(&cluster, "insecure-skip-tls-verify")
+                .unwrap_or_default(),
+        })
+    }
+}
+*/

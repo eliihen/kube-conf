@@ -37,20 +37,6 @@ pub struct User {
     pub client_key_data: Option<String>,
 }
 
-/*
-impl<'de> TryFrom<Mapping> for User {
-    type Error = de::Error + 'de;
-    fn try_from(map: Mapping) -> Result<Self, Self::Error> {
-        // let user = get_map(map, "user");
-        Ok(User {
-            name: get_string(map, "name")?,
-            certificate_authority: Some(String::new()),
-            server: Some(String::new()),
-        })
-    }
-}
-*/
-
 impl<'de> Deserialize<'de> for User {
     fn deserialize<D>(d: D) -> Result<Self, D::Error>
     where
@@ -78,3 +64,28 @@ impl<'de> Deserialize<'de> for User {
         // User::try_from(map)
     }
 }
+
+/*
+impl TryFrom<Mapping> for User {
+    type Error = de::Error;
+    fn try_from(map: Mapping) -> Result<Self, Self::Error> {
+        let name = get_string(&map, "name")?;
+        let user = get_mapping(map, "user")?;
+
+        Ok(User {
+            name,
+            token: get_string::<D::Error>(&user, "token").ok(),
+            username: get_string::<D::Error>(&user, "username").ok(),
+            password: get_string::<D::Error>(&user, "password").ok(),
+            client_certificate: get_string::<D::Error>(&user, "client-certificate")
+                .map(PathBuf::from)
+                .ok(),
+            client_certificate_data: get_string::<D::Error>(&user, "client-certificate-data").ok(),
+            client_key: get_string::<D::Error>(&user, "client-key")
+                .map(PathBuf::from)
+                .ok(),
+            client_key_data: get_string::<D::Error>(&user, "client-key-data").ok(),
+        })
+    }
+}
+*/
