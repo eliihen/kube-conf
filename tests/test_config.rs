@@ -190,3 +190,29 @@ pub fn it_returns_the_users_set() -> Result<()> {
 
     Ok(())
 }
+
+#[test]
+pub fn it_gets_the_current_context() -> Result<()> {
+    let path = format!("{}/tests/config.yml", env!("CARGO_MANIFEST_DIR"));
+    let config = Config::load(&path)?;
+
+    let context = config.get_current_context();
+    assert!(context.is_some(), "Current context not found");
+    assert_eq!(
+        context.unwrap().name,
+        "dev-frontend",
+        "Current context did not have the expected name"
+    );
+    assert_eq!(
+        context.unwrap().cluster,
+        "development",
+        "Current context did not have the expected cluster"
+    );
+    assert_eq!(
+        context.unwrap().user,
+        "developer",
+        "Current context did not have the expected user"
+    );
+
+    Ok(())
+}

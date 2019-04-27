@@ -24,7 +24,7 @@ contexts:
     namespace: default
     user: experimenter
   name: exp-scratch
-current-context: default/dev-m01-example-com:8443/user
+current-context: dev-frontend
 kind: Config
 preferences:
   fooValue: abc

@@ -57,9 +57,9 @@ use user::User;
 /// ```
 /// use kube_conf::Config;
 /// let config = Config::load("tests/config.yml")?;
-/// let current_context = config.current_context.unwrap();
+/// let current_context = config.get_current_context().unwrap();
 ///
-/// assert_eq!("default/dev-m01-example-com:8443/user", current_context);
+/// assert_eq!("dev-frontend", current_context.name);
 /// # Ok::<(), kube_conf::errors::Error>(())
 /// ```
 ///
@@ -74,7 +74,7 @@ use user::User;
 /// let config = Config::load_default()?;
 /// let current_context = config.current_context.unwrap();
 ///
-/// assert_eq!("default/dev-m01-example-com:8443/user", current_context);
+/// assert_eq!("dev-frontend", current_context);
 /// # Ok::<(), kube_conf::errors::Error>(())
 /// ```
 #[serde(rename_all = "kebab-case")]
@@ -83,8 +83,6 @@ pub struct Config {
     /// The name of the current active context.
     /// The actual context can be retrieved by finding the context in the
     /// context set based on this name.
-    ///
-    /// TODO make a `pub fn get_current_context -> Option<Context>`
     pub current_context: Option<String>,
 
     /// Preferences provided in the config.yml file.
@@ -135,5 +133,17 @@ impl Config {
         Ok(conf)
     }
 
-    // TODO pub fn get_current_context(&self) -> Option<Context>
+    /// Gets the currently active context based on the `current-context` key in
+    /// the config file.
+    pub fn get_current_context(&self) -> Option<&Context> {
+        if let Some(current_context) = &self.current_context {
+            for context in self.contexts.iter() {
+                if &context.name == current_context {
+                    return Some(context);
+                }
+            }
+        }
+
+        None
+    }
 }
