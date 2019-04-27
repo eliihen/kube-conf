@@ -78,7 +78,7 @@ use user::User;
 /// # Ok::<(), kube_conf::errors::Error>(())
 /// ```
 #[serde(rename_all = "kebab-case")]
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Config {
     /// The name of the current active context.
     /// The actual context can be retrieved by finding the context in the

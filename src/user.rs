@@ -3,7 +3,7 @@ use serde::{Deserialize, Deserializer};
 use serde_yaml::Mapping;
 
 /// TODO
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct User {
     pub name: String,
     pub token: Option<String>,

@@ -3,7 +3,7 @@ use serde::{Deserialize, Deserializer};
 use serde_yaml::Mapping;
 
 /// A cluster that
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Cluster {
     pub name: String,
     pub server: String,
