@@ -6,6 +6,12 @@ extern crate error_chain;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_yaml;
+extern crate void;
+
+mod cluster;
+mod context;
+mod get;
+mod user;
 
 /// A module that exposes errors thrown by the crate.
 ///
@@ -16,7 +22,7 @@ extern crate serde_yaml;
 /// be returned.
 pub mod errors {
     // Create the Error, ErrorKind, ResultExt, and Result types
-    error_chain!{
+    error_chain! {
         foreign_links {
             Yaml(serde_yaml::Error) #[doc = "Error when parsing a yaml file"];
         }
@@ -31,11 +37,14 @@ pub mod errors {
     }
 }
 
-use std::fs::read_to_string;
-use std::env;
-use std::collections::HashMap;
-use serde_yaml::Mapping;
+use cluster::Cluster;
+use context::Context;
 use errors::*;
+use serde_yaml::Mapping;
+use std::env;
+use std::fs::read_to_string;
+use std::path::Path;
+use user::User;
 
 /// The main struct that holds the entire config map.
 /// See the methods on this struct for ways to parse a config.
@@ -67,25 +76,34 @@ use errors::*;
 /// assert_eq!("default/dev-m01-example-com:8443/user", current_context);
 /// # Ok::<(), kube_conf::errors::Error>(())
 /// ```
+#[serde(rename_all = "kebab-case")]
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    /// Will typically be "v1"
-    #[serde(rename="apiVersion")]
-    pub api_version: Option<String>,
-
-    /// Will typically be "Config"
-    pub kind: Option<String>,
-
-    #[serde(rename="current-context")]
+    /// The name of the current active context.
+    /// The actual context can be retrieved by finding the context in the
+    /// context set based on this name.
+    ///
+    /// TODO make a `pub fn get_current_context -> Option<Context>`
     pub current_context: Option<String>,
 
+    /// Preferences provided in the config.yml file.
     pub preferences: Option<Mapping>,
 
-    //pub clusters: Vec<Cluster>,
+    /// The clusters as defined by the "clusters" key
+    pub clusters: Vec<Cluster>,
 
-    //pub contexts: Vec<Context>,
+    /// The contexts as defined by the "contexts" key
+    pub contexts: Vec<Context>,
 
-    //pub users: Vec<User>,
+    /// The users as defined by the "users" key
+    pub users: Vec<User>,
+
+    /// Will typically be "v1", generally not needed
+    #[serde(rename = "apiVersion")]
+    pub api_version: Option<String>,
+
+    /// Will typically be "Config", generally not needed
+    pub kind: Option<String>,
 }
 
 impl Config {
@@ -95,7 +113,7 @@ impl Config {
     /// otherwise.
     ///
     /// TODO: Support multiple kubeconfig files in the KUBECONFIG env var
-    /// separated by colons, i.e. `KUBECONFIG=file1:file2`.
+    /// separated by colons, i.e. `KUBECONFIG=file1:file2`. Merge the result.
     pub fn load_default() -> Result<Config> {
         if let Ok(conf_path) = env::var("KUBECONFIG") {
             return Config::load(&conf_path);
@@ -108,11 +126,13 @@ impl Config {
         bail!("Neither $KUBECONFIG nor $HOME are defined");
     }
 
-    pub fn load(path: &str) -> Result<Config> {
+    /// Fetches the config from the provided path.
+    pub fn load<P: AsRef<Path>>(path: P) -> Result<Config> {
         let conf = read_to_string(&path)
-            .chain_err(|| ErrorKind::MissingConfigFile(path.to_string()))?;
+            .chain_err(|| ErrorKind::MissingConfigFile(format!("{}", path.as_ref().display())))?;
         let conf = serde_yaml::from_str(&conf)?;
         Ok(conf)
     }
-}
 
+    // TODO pub fn get_current_context(&self) -> Option<Context>
+}
