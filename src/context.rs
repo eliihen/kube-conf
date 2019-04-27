@@ -35,7 +35,7 @@ impl<'de> Deserialize<'de> for Context {
         let context = get_mapping(map, "context")?;
 
         Ok(Context {
-            name: name,
+            name,
             cluster: get_string::<D::Error>(&context, "cluster")?,
             user: get_string::<D::Error>(&context, "user")?,
             namespace: get_string::<D::Error>(&context, "namespace").ok(),

@@ -39,7 +39,7 @@ impl<'de> Deserialize<'de> for User {
         let user = get_mapping(map, "user")?;
 
         Ok(User {
-            name: name,
+            name,
             token: get_string::<D::Error>(&user, "token").ok(),
             username: get_string::<D::Error>(&user, "username").ok(),
             password: get_string::<D::Error>(&user, "password").ok(),
