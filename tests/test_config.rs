@@ -216,3 +216,72 @@ pub fn it_gets_the_current_context() -> Result<()> {
 
     Ok(())
 }
+
+#[test]
+pub fn it_gets_the_cluster_from_a_context() -> Result<()> {
+    let path = format!("{}/tests/config.yml", env!("CARGO_MANIFEST_DIR"));
+    let config = Config::load(&path)?;
+
+    let context = config.get_current_context().unwrap();
+    let cluster = context.get_cluster(&config);
+
+    assert!(cluster.is_some(), "Cluster of context not found");
+    let cluster = cluster.unwrap();
+
+    assert_eq!(
+        cluster.name, "development",
+        "Cluster of context did not have the expected name"
+    );
+    assert!(
+        cluster.certificate_authority.is_some(),
+        "Expected the cluster of context to have a certificate-authority set"
+    );
+    assert_eq!(
+        cluster.certificate_authority.as_ref().unwrap(),
+        &PathBuf::from("fake-ca-file"),
+        "Cluster of context did not have the expected certificate-authority"
+    );
+    assert_eq!(
+        cluster.server, "https://1.2.3.4",
+        "Cluster of context did not have the expected server"
+    );
+
+    Ok(())
+}
+
+#[test]
+pub fn it_gets_the_user_from_a_context() -> Result<()> {
+    let path = format!("{}/tests/config.yml", env!("CARGO_MANIFEST_DIR"));
+    let config = Config::load(&path)?;
+
+    let context = config.get_current_context().unwrap();
+    let user = context.get_user(&config);
+
+    assert!(user.is_some(), "User of context not found");
+    let user = user.unwrap();
+
+    assert_eq!(
+        user.name, "developer",
+        "User of context did not have the expected name"
+    );
+    assert!(
+        user.client_certificate.is_some(),
+        "Expected the User of context to have a client-certificate set"
+    );
+    assert_eq!(
+        user.client_certificate.as_ref().unwrap(),
+        &PathBuf::from("fake-cert-file"),
+        "User of context did not have the expected client-certificate"
+    );
+    assert!(
+        user.client_key.is_some(),
+        "Expected the User of context to have a client-key set"
+    );
+    assert_eq!(
+        user.client_key.as_ref().unwrap(),
+        &PathBuf::from("fake-key-file"),
+        "User of context did not have the expected client-key"
+    );
+
+    Ok(())
+}

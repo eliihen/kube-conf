@@ -1,6 +1,7 @@
 //! The module holding the `Context` struct
 
 use crate::get::{get_mapping, get_string};
+use crate::{Cluster, Config, User};
 use serde::{Deserialize, Deserializer};
 use serde_yaml::Mapping;
 
@@ -23,6 +24,32 @@ pub struct Context {
 
     /// The user `name` this cluster refers to
     pub user: String,
+}
+
+impl Context {
+    /// Gets the `Cluster` object associated with this context if it exists in
+    /// the provided config object.
+    pub fn get_cluster(&self, config: &Config) -> Option<Cluster> {
+        for cluster in config.clusters.iter() {
+            if &cluster.name == &self.cluster {
+                return Some(cluster.clone());
+            }
+        }
+
+        None
+    }
+
+    /// Gets the `User` object associated with this context if it exists in the
+    /// provided config object.
+    pub fn get_user(&self, config: &Config) -> Option<User> {
+        for user in config.users.iter() {
+            if &user.name == &self.user {
+                return Some(user.clone());
+            }
+        }
+
+        None
+    }
 }
 
 impl<'de> Deserialize<'de> for Context {
