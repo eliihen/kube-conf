@@ -147,7 +147,44 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! Welcome to the `kube-conf` crate.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This crate is a convenient way of fetching the local user&#39;s kubernetes</span>
+<span class="doccomment">//! config file and reading the values.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Examples</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Fetching current context</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use kube_conf::Config;</span>
+<span class="doccomment">//! let config = Config::load(&quot;tests/config.yml&quot;)?;</span>
+<span class="doccomment">//! let current_context = config.get_current_context().unwrap();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! assert_eq!(&quot;dev-frontend&quot;, current_context.name);</span>
+<span class="doccomment">//! # Ok::&lt;(), kube_conf::errors::Error&gt;(())</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Fetching the default kubeconfig file</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This typically means the file located at `$HOME/.kube/config`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use kube_conf::Config;</span>
+<span class="doccomment">//! # use std::env::{set_var, current_dir};</span>
+<span class="doccomment">//! # set_var(&quot;HOME&quot;, format!(&quot;{}/tests&quot;, current_dir().unwrap().to_str().unwrap()));</span>
+<span class="doccomment">//! let config = Config::load_default()?;</span>
+<span class="doccomment">//! let current_context = config.current_context.unwrap();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! assert_eq!(&quot;dev-frontend&quot;, current_context);</span>
+<span class="doccomment">//! # Ok::&lt;(), kube_conf::errors::Error&gt;(())</span>
+<span class="doccomment">//! ```</span>
+
 <span class="comment">// `error_chain!` can recurse deeply</span>
 <span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;1024&quot;</span>]</span>
 
@@ -156,7 +193,6 @@
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_derive</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_yaml</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">void</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cluster</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">context</span>;
@@ -199,34 +235,6 @@
 
 <span class="doccomment">/// The main struct that holds the entire config map.</span>
 <span class="doccomment">/// See the methods on this struct for ways to parse a config.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Fetching current context</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use kube_conf::Config;</span>
-<span class="doccomment">/// let config = Config::load(&quot;tests/config.yml&quot;)?;</span>
-<span class="doccomment">/// let current_context = config.get_current_context().unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(&quot;dev-frontend&quot;, current_context.name);</span>
-<span class="doccomment">/// # Ok::&lt;(), kube_conf::errors::Error&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Fetching the default kubeconfig file</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This typically means the file located at `$HOME/.kube/config`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use kube_conf::Config;</span>
-<span class="doccomment">/// # use std::env::{set_var, current_dir};</span>
-<span class="doccomment">/// # set_var(&quot;HOME&quot;, format!(&quot;{}/tests&quot;, current_dir().unwrap().to_str().unwrap()));</span>
-<span class="doccomment">/// let config = Config::load_default()?;</span>
-<span class="doccomment">/// let current_context = config.current_context.unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(&quot;dev-frontend&quot;, current_context);</span>
-<span class="doccomment">/// # Ok::&lt;(), kube_conf::errors::Error&gt;(())</span>
-<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;kebab-case&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Config</span> {
