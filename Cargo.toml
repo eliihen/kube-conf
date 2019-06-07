@@ -1,6 +1,6 @@
 [package]
 name = "kube-conf"
-version = "0.1.1-alpha.0"
+version = "0.2.0"
 authors = ["Espen Henriksen <dev+kubeconf@henriksen.is>"]
 edition = "2018"
 description = "Easily fetch the user's local Kubernetes config file"
