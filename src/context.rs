@@ -43,7 +43,7 @@ impl Context {
     /// provided config object.
     pub fn get_user(&self, config: &Config) -> Option<User> {
         for user in config.users.iter() {
-            if &user.name == &self.user {
+            if user.name == self.user {
                 return Some(user.clone());
             }
         }
